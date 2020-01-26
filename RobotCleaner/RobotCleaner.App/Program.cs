@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices.ComTypes;
 using RobotCleaner.App.Infrastructure;
+using RobotCleaner.App.Infrastructure.Contracts;
+using RobotCleaner.App.Infrastructure.Factory;
+using RobotCleaner.App.Infrastructure.Models;
 
 namespace RobotCleaner.App
 {
     class Program
     {
-        private static Robot _robot;
-        private static RobotEngine _robotEngine;
+        private static IRobot _robot;
+
         static void Main(string[] args)
         {
             string command = "";
@@ -40,7 +43,7 @@ namespace RobotCleaner.App
                     break;
                 case "-r":
                 case "report":
-                    ReadTheReport();
+                    ReadTheLastReport();
                     break;
                 case "-q":
                 case "quit":
@@ -53,31 +56,31 @@ namespace RobotCleaner.App
 
         private static void StartTheRobot()
         {
-            var instructions = new Instructions();
+            var minCoordinate = Coordinate.CreateInstance(-100_000, -100_000);
+            var maxCoordinate = Coordinate.CreateInstance(100_000, 100_000);
 
             var commandsCount = PrintOutInput("Please enter the number of robot commands:");
             var startingPosition = PrintOutInput("Please enter the starting position coordinates {x y}:");
-            var coordinate = startingPosition.Trim().Split(' ');
-            int.TryParse(coordinate[0], out var x);
-            int.TryParse(coordinate[1], out var y);
-            instructions.StartingPosition =new Coordinate(x, y);
-
-
+            var commands = new List<string>();
             for (var i = 1; i <= int.Parse(commandsCount); i++)
             {
                 var cmd = PrintOutInput($"Please enter the command number ({i}):");
-                var movement = cmd.Trim().Split(' ');
-                int.TryParse(movement[1], out var steps);
-                instructions.Movements.Add(new Movement(movement[0].ToUpper(), steps));
+                commands.Add(cmd);
             }
-            _robotEngine = new RobotEngine(instructions);
-            _robot = new Robot(_robotEngine);
+
+            var inputs = new InputsModel
+            {
+                StartingPosition = startingPosition,
+                Commands = commands
+            };
+
+            _robot = RobotFactory.CreateRobot(inputs, minCoordinate, maxCoordinate);
 
             _robot.StartCleaning();
 
         }
 
-        private static void ReadTheReport()
+        private static void ReadTheLastReport()
         {
             Console.WriteLine($"{_robot.CleanedPositions}");
         }

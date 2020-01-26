@@ -1,88 +1,81 @@
 ﻿using System.Collections.Generic;
+using RobotCleaner.App.Infrastructure.Contracts;
+using RobotCleaner.App.Infrastructure.Models;
 
 namespace RobotCleaner.App.Infrastructure
 {
-    public class RobotEngine
+    public class RobotEngine : IRobotEngine
     {
-        private readonly Instructions _instructions;
-        private Coordinate _CurrentPosition;
-        public HashSet<Coordinate> CleanedPositions { get; private set; }
-        public RobotEngine(Instructions instructions)
-        {
-            CleanedPositions = new HashSet<Coordinate>();
 
-            _instructions = instructions;
-            _CurrentPosition = _instructions.StartingPosition;
+        private readonly IEnumerable<IMovement> _movements;
+        private Coordinate _currentPosition;
+        private readonly Coordinate _minCoordinate;
+        private readonly Coordinate _maxCoordinate;
+        public HashSet<Coordinate> CleanedPositions { get; private set; }
+
+        public RobotEngine(Coordinate startingPosition, List<IMovement> movements, Coordinate minCoordinate, Coordinate maxCoordinate)
+        {
+            _currentPosition = startingPosition;
+            _movements = movements;
+            _minCoordinate = minCoordinate;
+            _maxCoordinate = maxCoordinate;
+
+            CleanedPositions = new HashSet<Coordinate>();
         }
 
         public void RunEngine()
         {
             RegisterCleanedPosition();
-            foreach (var movement in _instructions.Movements)
+            foreach (var movement in _movements)
             {
-                MoveTo(movement);
+                for (var i = 0; i < movement.Steps; i++)
+                {
+                    MoveTo(movement.Direction);
+                    RegisterCleanedPosition();
+                }
             }
         }
-
-        private void MoveTo(Movement movement)
+        private void MoveTo(Direction direction)
         {
-            switch (movement.Direction)
+            switch (direction)
             {
-                case "E":
-                    MoveToEast(movement.Steps);
+                case Direction.East:
+                    MoveToEast();
                     break;
-                case "W":
-                    MoveToWest(movement.Steps);
+                case Direction.West:
+                    MoveToWest();
                     break;
-                case "N":
-                    MoveToNorth(movement.Steps);
+                case Direction.North:
+                    MoveToNorth();
                     break;
-                case "S":
-                    MoveToSouth(movement.Steps);
+                case Direction.South:
+                    MoveToSouth();
                     break;
             }
 
         }
-        private void MoveToEast(int steps)
+        private void MoveToEast()
         {
-            for (var i = 0; i < steps; i++)
-            {
-                _CurrentPosition.MoveStepToEast();
-                RegisterCleanedPosition();
-            }
+            if (_currentPosition < _maxCoordinate)
+                _currentPosition.MoveStepToEast();
         }
-
-        private void MoveToWest(int steps)
+        private void MoveToWest()
         {
-            for (var i = 0; i < steps; i++)
-            {
-                _CurrentPosition.MoveStepToWest();
-                RegisterCleanedPosition();
-            }
+            if (_currentPosition > _minCoordinate)
+                _currentPosition.MoveStepToWest();
         }
-
-        private void MoveToNorth(int steps)
+        private void MoveToNorth()
         {
-            for (var i = 0; i < steps; i++)
-            {
-                _CurrentPosition.MoveStepToNorth();
-                RegisterCleanedPosition();
-            }
+            if (_currentPosition < _maxCoordinate)
+                _currentPosition.MoveStepToNorth();
         }
-
-        private void MoveToSouth(int steps)
+        private void MoveToSouth()
         {
-            for (var i = 0; i < steps; i++)
-            {
-                _CurrentPosition.MoveStepToSouth();
-                RegisterCleanedPosition();
-            }
+            if (_currentPosition > _minCoordinate)
+                _currentPosition.MoveStepToSouth();
         }
-
-        private void RegisterCleanedPosition()
-        {
-            CleanedPositions.Add(_CurrentPosition);
-        }
+        private void RegisterCleanedPosition() => CleanedPositions.Add(_currentPosition);
 
     }
+
 }

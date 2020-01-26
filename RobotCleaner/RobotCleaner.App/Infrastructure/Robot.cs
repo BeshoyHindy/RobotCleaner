@@ -1,9 +1,12 @@
-﻿namespace RobotCleaner.App.Infrastructure
+﻿using RobotCleaner.App.Infrastructure.Contracts;
+
+namespace RobotCleaner.App.Infrastructure
 {
-    public class Robot
+    public class Robot : IRobot
     {
-        private readonly RobotEngine _robotEngine;
-        public Robot(RobotEngine robotEngine)
+
+        private readonly IRobotEngine _robotEngine;
+        public Robot(IRobotEngine robotEngine)
         {
             _robotEngine = robotEngine;
         }
