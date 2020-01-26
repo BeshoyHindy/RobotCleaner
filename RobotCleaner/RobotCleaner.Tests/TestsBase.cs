@@ -3,11 +3,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace RobotCleaner.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class TestsBase
     {
-        [TestMethod]
-        public void TestMethod1()
+        [AssemblyInitialize()]
+        public static void AssemblyInit(TestContext context)
         {
         }
+
     }
 }

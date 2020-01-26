@@ -16,7 +16,7 @@ namespace RobotCleaner.App.Infrastructure
             _robotEngine.RunEngine();
         }
 
-        public string CleanedPositions => $"=> Cleaned: {_robotEngine.CleanedPositions.Count}";
+        public string CleanedPositions => $"Cleaned: {_robotEngine.CleanedPositions.Count}";
 
     }
 }
