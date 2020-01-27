@@ -6,7 +6,6 @@ The goal of the project is to implement a prototype of a robot designed to clean
 # How to use:
 
 - You will need the latest Visual Studio 2019 and the .NET Core SDK 3.1.
-- **Please check if you have installed the same runtime version (SDK) described in global.json**
 - The latest SDK and tools can be downloaded from https://dot.net/core.
 
 Also you can run the Project in Visual Studio Code (Windows, Linux or MacOS).
